@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/react-in-jsx-scope */
-import {useContext, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {View, Keyboard} from 'react-native';
 
 import {Button} from '../../components/Button';
@@ -10,67 +10,50 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import {InputText} from '../../components/Input';
 import StockContext from '../../context/Stockcontext';
 import Modal from 'react-native-modal';
-//import { finnhubApi } from '../../../api/Api';
+
+type availableStock = {label: string; value: string};
 
 export const HomeScreen = () => {
   const context = useContext(StockContext);
   const [priceAlert, setpriceAlert] = useState<string>('');
-  //const [stocksAvailable, setstocksAvailable] = useState([]);
-  const availableStocks = [
-    {
-      description: 'Binance ASTR/BTC',
-      displaySymbol: 'ASTR/BTC',
-      symbol: 'BINANCE:ASTRBTC',
-    },
-    {
-      description: 'Binance WBTC/USDT',
-      displaySymbol: 'WBTC/USDT',
-      symbol: 'BINANCE:WBTCUSDT',
-    },
-    {
-      currency: 'USD',
-      description: 'AMAZON.COM INC',
-      displaySymbol: 'AMZN',
-      figi: 'BBG000BVPV84',
-      isin: null,
-      mic: 'XNAS',
-      shareClassFIGI: 'BBG001S5PQL7',
-      symbol: 'AMZN',
-      symbol2: '',
-      type: 'Common Stock',
-    },
-    {
-      currency: 'USD',
-      description: 'MICROSOFT CORP',
-      displaySymbol: 'MSFT',
-      figi: 'BBG000BPH459',
-      isin: null,
-      mic: 'XNAS',
-      shareClassFIGI: 'BBG001S5TD05',
-      symbol: 'MSFT',
-      symbol2: '',
-      type: 'Common Stock',
-    },
-  ];
+
   const [isModalVisible, setisModalVisible] = useState(false);
   //Dropdown
   const [open, setOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState<string>('');
-  const [items, setItems] = useState(
+  /*   const [items, setItems] = useState(
     availableStocks.map(item => ({
       label: item.displaySymbol,
       value: item.symbol,
     })),
-  );
+  ); */
+  const [availableStocks, setavailableStocks] = useState<availableStock[]>([]);
 
-  /* const getAvailableStocks = async() => {
-    const res = await finnhubApi.get('/')
-  }
+  const getAvailableStocks = async () => {
+    try {
+      const data = await context?.getStockData(
+        'stock/symbol?exchange=US&token=ckpki91r01qkitmj3tmgckpki91r01qkitmj3tn0',
+      );
+      if (data) {
+        setavailableStocks(
+          data.map(item => ({
+            label: item.displaySymbol,
+            value: item.symbol,
+          })),
+        );
+      }
 
-  useEffect(()=>{
-    getAvailableStocks()
-  },[])
-   */
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getAvailableStocks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const AddNewAlert = () => {
     Keyboard.dismiss();
     setisModalVisible(true);
@@ -101,10 +84,10 @@ export const HomeScreen = () => {
         <DropDownPicker
           open={open}
           value={selectedStock}
-          items={items}
+          items={availableStocks}
           setOpen={setOpen}
           setValue={setSelectedStock}
-          setItems={setItems}
+          setItems={setavailableStocks}
           placeholder="Select a stock to watch"
         />
         <InputText
