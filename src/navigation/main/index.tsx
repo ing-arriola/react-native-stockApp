@@ -1,18 +1,15 @@
 /* eslint-disable react/react-in-jsx-scope */
-import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {HomeScreen} from '../screens/Homescreen/Homescreen';
-import {AlertsScreen} from '../screens/AlertsScreen/AlertsScreen';
+import {HomeScreen, AlertsScreen} from '../../screens';
 
 export type ParamListBase = {
   Home: undefined;
   ProductDetail: {stock: string};
 };
 
-//const MainNavigation = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const MainNavigator = () => {
+export const TabNavigator = () => {
   return (
     <Tab.Navigator initialRouteName="Home">
       <Tab.Screen
@@ -26,13 +23,5 @@ const MainNavigator = () => {
         options={{headerShown: false}}
       />
     </Tab.Navigator>
-  );
-};
-
-export const AppNavigator = () => {
-  return (
-    <NavigationContainer>
-      <MainNavigator />
-    </NavigationContainer>
   );
 };
